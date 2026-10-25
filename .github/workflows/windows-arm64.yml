@@ -1,0 +1,32 @@
+name: Windows ARM64 build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build RustGIS for Windows ARM64
+    runs-on: windows-11-arm
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable and Windows ARM64 target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-pc-windows-msvc
+
+      - name: Build desktop app
+        run: cargo build --locked --release -p rustgis --target aarch64-pc-windows-msvc
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustgis-windows-arm64
+          path: target/aarch64-pc-windows-msvc/release/rustgis.exe
+          if-no-files-found: error
